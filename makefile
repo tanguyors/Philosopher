@@ -4,7 +4,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Werror -pthread
 LIBFT = libft/libft.a
 
-SRCS = main.c init.c philosophers.c utils.c
+SRCS = main.c init.c philosophers.c utils.c routine.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(LIBFT) $(NAME)

@@ -39,5 +39,6 @@ void *philosopher(void *arg);
 long long get_time(void);
 void smart_sleep(long long time, t_data *data);
 void print_status(t_data *data, int id, char *status);
+void *routine(void *arg);
 
 #endif

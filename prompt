@@ -1,0 +1,10 @@
+Jour 3 : Création et lancement des threads
+Créer le tableau de philosophes
+Remplir la structure (ID, pointeur vers t_data, initialisation du last_meal_time).
+Implémenter la création de threads
+Boucle qui parcourt les philosophes et fait pthread_create(&thread[i], NULL, &routine, &philo[i]).
+Mettre en place la fonction routine (sans la logique complète pour l’instant)
+Juste un squelette pour valider que les threads se lancent et se terminent.
+Tester la création/fin des threads
+Vérifier qu’on peut démarrer et terminer proprement le programme sans leaks ni crash.
+Objectif de la journée : Avoir les threads qui se lancent correctement et “vivent” dans le programme, même si la logique de manger/dormir/penser n’est pas encore finalisée.

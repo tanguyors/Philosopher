@@ -8,31 +8,43 @@ long long get_time(void)
     return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 }
 
-int init_data(t_data *data)
+int init_data(t_data *data, int argc, char **argv)
 {
     int i;
 
-    // 1) Démarrer la simulation (ou on peut le faire ailleurs)
-    //    On stocke le temps de départ, qui servira à calculer
-    //    "combien de ms se sont écoulées" pour l'affichage
-    data->start_time = get_time();
+    // Parsing des arguments
+    data->num_philos = ft_atoi(argv[1]);
+    data->time_to_die = ft_atoi(argv[2]);
+    data->time_to_eat = ft_atoi(argv[3]);
+    data->time_to_sleep = ft_atoi(argv[4]);
+    data->num_must_eat = -1;  // Valeur par défaut si non spécifié
+    if (argc == 6)
+        data->num_must_eat = ft_atoi(argv[5]);
 
-    // 2) data->finished = 0 pour dire que la simulation n'est pas terminée
+    // Vérification des valeurs
+    if (data->num_philos <= 0 || data->time_to_die <= 0 
+        || data->time_to_eat <= 0 || data->time_to_sleep <= 0 
+        || (argc == 6 && data->num_must_eat <= 0))
+    {
+        ft_printf("Error: Invalid arguments\n");
+        return (1);
+    }
+
+    // Initialisation du temps de départ et de l'état
+    data->start_time = get_time();
     data->finished = 0;
 
-    // 3) Allouer la mémoire pour le tableau de fourchettes
+    // Allocation et initialisation des mutex pour les fourchettes
     data->forks = malloc(sizeof(pthread_mutex_t) * data->num_philos);
     if (!data->forks)
     {
         ft_printf("Error: malloc forks failed\n");
-        return (1); // ou ta gestion d'erreur
+        return (1);
     }
 
-    // 4) Initialiser chaque mutex "fork"
     i = 0;
     while (i < data->num_philos)
     {
-        // pthread_mutex_init renvoie 0 en cas de succès, sinon != 0
         if (pthread_mutex_init(&data->forks[i], NULL) != 0)
         {
             ft_printf("Error: pthread_mutex_init forks[%d] failed\n", i);
@@ -41,14 +53,14 @@ int init_data(t_data *data)
         i++;
     }
 
-    // 5) Initialiser le mutex d'écriture
+    // Initialisation du mutex d'écriture
     if (pthread_mutex_init(&data->write_mutex, NULL) != 0)
     {
         ft_printf("Error: pthread_mutex_init write_mutex failed\n");
         return (1);
     }
 
-    // 6) Allouer le tableau de philosophes
+    // Allocation et initialisation des philosophes
     data->philos = malloc(sizeof(t_philo) * data->num_philos);
     if (!data->philos)
     {
@@ -56,23 +68,18 @@ int init_data(t_data *data)
         return (1);
     }
 
-    // 7) Initialiser chaque philosophe du tableau
     i = 0;
     while (i < data->num_philos)
     {
-        data->philos[i].id = i;
+        data->philos[i].id = i + 1;  // On commence à 1 pour l'affichage
         data->philos[i].meals_eaten = 0;
-        data->philos[i].last_meal = 0; // on peut mettre 0, ou get_time() ultérieurement
+        data->philos[i].last_meal = data->start_time;  // Initialisation au temps de départ
         data->philos[i].data = data;
-        
-        // -> Indice de la fourchette gauche
         data->philos[i].left_fork = i;
-        // -> Indice de la fourchette droite
         data->philos[i].right_fork = (i + 1) % data->num_philos;
-        
         i++;
     }
-    // 8) Si tout est bon, on renvoie 0 pour dire "Succès"
+
     return (0);
 }
 
