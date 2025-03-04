@@ -8,7 +8,9 @@ void *routine(void *arg)
     
     // Pour l'instant, on affiche juste que le philosophe a commencé
     pthread_mutex_lock(&philo->data->write_mutex);
-    ft_printf("%lld %d has started\n", get_time() - philo->data->start_time, philo->id);
+    printf("%lld %d has started\n", 
+        get_time() - philo->data->start_time, 
+        philo->id);
     pthread_mutex_unlock(&philo->data->write_mutex);
 
     // On attend un peu pour simuler une activité
@@ -16,7 +18,9 @@ void *routine(void *arg)
 
     // On affiche que le philosophe a terminé
     pthread_mutex_lock(&philo->data->write_mutex);
-    ft_printf("%lld %d has finished\n", get_time() - philo->data->start_time, philo->id);
+    printf("%lld %d has finished\n", 
+        get_time() - philo->data->start_time, 
+        philo->id);
     pthread_mutex_unlock(&philo->data->write_mutex);
 
     return (NULL);

@@ -1,29 +1,49 @@
+# Nom du programme
 NAME = philo
 
+# Compilateur et flags
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -pthread
-LIBFT = libft/libft.a
 
-SRCS = main.c init.c philosophers.c utils.c routine.c
+# Chemins
+LIBFT_PATH = libft
+LIBFT = $(LIBFT_PATH)/libft.a
+
+# Sources
+SRCS = main.c \
+       init.c \
+       routine.c
+
+# Objets
 OBJS = $(SRCS:.c=.o)
 
+# Headers
+HEADERS = philo.h
+INCLUDES = -I. -I$(LIBFT_PATH)
+
+# Règles
 all: $(LIBFT) $(NAME)
 
-$(NAME): $(OBJS) $(LIBFT)
-	$(CC) $(CFLAGS) $(OBJS) -L$(LIBFT_DIR) -lft -o $(NAME)
-
+# Compilation de la libft
 $(LIBFT):
-	make -C libft
+	make -C $(LIBFT_PATH)
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+# Compilation du programme principal
+$(NAME): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -L$(LIBFT_PATH) -lft -o $(NAME)
+
+# Compilation des objets
+%.o: %.c $(HEADERS)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
-	make -C libft clean
-	rm -f $(OBJ)
+	make -C $(LIBFT_PATH) clean
+	rm -f $(OBJS)
 
 fclean: clean
-	make -C libft fclean
+	make -C $(LIBFT_PATH) fclean
 	rm -f $(NAME)
 
 re: fclean all
+
+.PHONY: all clean fclean re
