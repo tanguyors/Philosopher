@@ -35,6 +35,24 @@ int main(int argc, char **argv)
         }
         i++;
     }
+    
+    while(!data.finished)
+    {
+        i = 0;
+        while(i < data.num_philos)
+        {
+            if(checkdeath(&data.philos[i]))
+            {
+                pthread_mutex_lock(&data.write_mutex);
+                ft_printf("%d philo %d a succomber\n", (int)(get_time() - data.start_time), data.philos[i].id);
+                data.finished = 1;
+                pthread_mutex_unlock(&data.write_mutex);
+                return(0);
+            }
+            i++;
+            usleep(100);
+        }
+    }
 
     // Attente de la fin des threads
     i = 0;
