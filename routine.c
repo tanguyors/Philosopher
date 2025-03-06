@@ -6,7 +6,7 @@ void *routine(void *arg)
 
     philo = (t_philo *)arg;
 
-    // Première vérification avant de commencer
+    // Message de démarrage
     if (!philo->data->finished)
     {
         pthread_mutex_lock(&philo->data->write_mutex);
@@ -14,20 +14,19 @@ void *routine(void *arg)
         pthread_mutex_unlock(&philo->data->write_mutex);
     }
 
-    if(!philo->data->finished)
-        takeforks(philo);
+    // Petit délai pour les philosophes pairs
+    if (philo->id % 2 == 0)
+        usleep(100);
 
-    // Vérification avant d'attendre
-    if (!philo->data->finished)
-        usleep(1000000);
-
-    // Vérification avant de finir
-    if (!philo->data->finished)
+    // Boucle principale
+    while (!philo->data->finished)
     {
-        pthread_mutex_lock(&philo->data->write_mutex);
-        ft_printf("%d philo %d has finished\n", (int)(get_time() - philo->data->start_time), philo->id);
-        pthread_mutex_unlock(&philo->data->write_mutex);
+        takeforks(philo);
+        if (philo->can_eat)
+            eat(philo);
+        usleep(100); // Petit délai entre les tentatives
     }
+
     return (NULL);
 }
 
@@ -67,6 +66,7 @@ void    takeforks(t_philo *philo)
         }
         pthread_mutex_lock(&philo->data->forks[philo->left_fork]);
         print_fork_message(philo);
+        philo->can_eat = 1;
     }
     else
     {
@@ -79,11 +79,35 @@ void    takeforks(t_philo *philo)
         }
         pthread_mutex_lock(&philo->data->forks[philo->right_fork]);
         print_fork_message(philo);
+        philo->can_eat = 1;
     }
 
     if(philo->data->finished)
     {
         pthread_mutex_unlock(&philo->data->forks[philo->right_fork]);
         pthread_mutex_unlock(&philo->data->forks[philo->left_fork]);
+    }
+}
+
+void    release_forks(t_philo *philo)
+{
+    pthread_mutex_unlock(&philo->data->forks[philo->left_fork]);
+    pthread_mutex_unlock(&philo->data->forks[philo->right_fork]);
+    philo->can_eat = 0;  // Le philosophe ne peut plus manger
+}
+
+void eat(t_philo *philo)
+{
+    if(!philo->data->finished)
+    {
+        if(philo->can_eat)
+        {
+            pthread_mutex_lock(&philo->data->write_mutex);
+            ft_printf("%d philo %d is eating ...\n", (int)(get_time() - philo->data->start_time), philo->id);
+            pthread_mutex_unlock(&philo->data->write_mutex);
+            philo->last_meal = get_time();
+            usleep(philo->data->time_to_eat * 1000);
+            release_forks(philo);
+        }
     }
 }

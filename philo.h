@@ -16,7 +16,8 @@ typedef struct s_philo
     long long last_meal;       // Timestamp du dernier repas
     int meals_eaten;           // Nombre de repas mangés
     struct s_data *data;       // Pointeur vers les données globales
-    pthread_t thread;          // Thread du philosophe
+    pthread_t thread;
+    int can_eat;          // Thread du philosophe
 } t_philo;
 
 typedef struct s_data
@@ -43,4 +44,8 @@ void *routine(void *arg);
 int checkdeath(t_philo *philo);
 void print_fork_message(t_philo *philo);
 void    takeforks(t_philo *philo);
+int	start_simulation(t_data *data);
+void	clean_simulation(t_data *data);
+void    eat(t_philo *philo);
+void    release_forks(t_philo *philos);
 #endif

@@ -77,6 +77,7 @@ int init_data(t_data *data, int argc, char **argv)
         data->philos[i].data = data;
         data->philos[i].left_fork = i;
         data->philos[i].right_fork = (i + 1) % data->num_philos;
+        data->philos[i].can_eat = 0;
         i++;
     }
 
