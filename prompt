@@ -1,7 +1,23 @@
+Nous avons corrigé le problème de synchronisation initial où certains philosophes ne mangeaient pas
+Nous avons ajouté un délai pour les philosophes pairs
+Nous avons mis en place une boucle while fonctionnelle dans routine
+Nous avons vérifié que la gestion des fourchettes et du flag can_eat fonctionne
+Plan d'action pour demain :
+Ajouter les états manquants :
+Créer une fonction sleep_philo
+Créer une fonction think_philo
+Les intégrer dans la boucle routine
+Optimiser les messages :
+Enlever les "..." dans "is eating"
+Revoir le format des messages pour les fourchettes
+Ajouter les messages pour sleeping et thinking
+Améliorer le rythme des philosophes :
+Ajouter des délais appropriés entre les actions
+S'assurer que le time_to_sleep est respecté
+Gérer correctement les transitions entre les états
+Tests finaux :
+Tester avec différents nombres de philosophes
+Vérifier qu'aucun philosophe ne meurt
+Valider le comportement avec l'option nombre de repas
 
-Pour demain, nous devrons travailler sur :
-La gestion de la mort des philosophes
-Le compteur de repas
-La synchronisation et les deadlocks
-La gestion propre de la fin du programme
-Bonne soirée ! À demain pour la suite du projet Philosophers.
+
