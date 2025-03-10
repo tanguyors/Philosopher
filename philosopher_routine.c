@@ -1,56 +1,68 @@
 #include "philo.h"
 
-void *routine(void *arg)
+static int    is_simulation_finished(t_philo *philo)
 {
-    t_philo *philo;
-
-    philo = (t_philo *)arg;
-
     pthread_mutex_lock(&philo->data->finished_mutex);
     if (philo->data->finished)
     {
         pthread_mutex_unlock(&philo->data->finished_mutex);
-        return (NULL);
+        return (1);
     }
     pthread_mutex_unlock(&philo->data->finished_mutex);
+    return (0);
+}
 
-    pthread_mutex_lock(&philo->data->finished_mutex);
-    if (!philo->data->finished)
-    {
-        pthread_mutex_unlock(&philo->data->finished_mutex);
-        pthread_mutex_lock(&philo->data->write_mutex);
-        ft_printf("%d  philo %d has started\n", (int)(get_time() - philo->data->start_time), philo->id);
-        pthread_mutex_unlock(&philo->data->write_mutex);
-    }
+static void    announce_philosopher_start(t_philo *philo)
+{
+    pthread_mutex_lock(&philo->data->write_mutex);
+    ft_printf("%d  philo %d has started\n",
+        (int)(get_current_time_ms() - philo->data->start_time), philo->id);
+    pthread_mutex_unlock(&philo->data->write_mutex);
+}
+
+void    attempt_to_acquire_forks(t_philo *philo)
+{
+    if (is_simulation_finished(philo))
+        return;
+    if (philo->id % 2 == 0)
+        acquire_forks_even_philosopher(philo);
     else
-        pthread_mutex_unlock(&philo->data->finished_mutex);
+        acquire_forks_odd_philosopher(philo);
+    if (is_simulation_finished(philo))
+    {
+        release_philosopher_forks(philo);
+        return;
+    }
+    philo->can_eat = 1;
+}
 
+void    *execute_philosopher_routine(void *arg)
+{
+    t_philo *philo;
+
+    philo = (t_philo *)arg;
+    if (is_simulation_finished(philo))
+        return (NULL);
+    announce_philosopher_start(philo);
     if (philo->id % 2 == 0)
         usleep(100);
-
-    pthread_mutex_lock(&philo->data->finished_mutex);
-    while (!philo->data->finished)
+    while (!is_simulation_finished(philo))
     {
-        pthread_mutex_unlock(&philo->data->finished_mutex);
-        takeforks(philo);
+        attempt_to_acquire_forks(philo);
         if (philo->can_eat)
-            eat(philo);
+            handle_philosopher_meal(philo);
         usleep(100);
-        pthread_mutex_lock(&philo->data->finished_mutex);
     }
-    pthread_mutex_unlock(&philo->data->finished_mutex);
-
-    release_forks(philo);
     return (NULL);
 }
 
-int checkdeath(t_philo *philo)
+int    checkdeath(t_philo *philo)
 {
     long long actual_time;
     long long time_no_eat;
     long long last_meal_time;
 
-    actual_time = get_time();
+    actual_time = get_current_time_ms();
     pthread_mutex_lock(&philo->data->meal_mutex);
     last_meal_time = philo->last_meal;
     pthread_mutex_unlock(&philo->data->meal_mutex);
@@ -64,7 +76,7 @@ int checkdeath(t_philo *philo)
 void    print_fork_message(t_philo *philo)
 {
     pthread_mutex_lock(&philo->data->write_mutex);
-    ft_printf("%d philo %d has taken a fork\n", (int)(get_time() - philo->data->start_time), philo->id);
+    ft_printf("%d philo %d has taken a fork\n", (int)(get_current_time_ms() - philo->data->start_time), philo->id);
     pthread_mutex_unlock(&philo->data->write_mutex);
 }
 
@@ -128,13 +140,13 @@ void eat(t_philo *philo)
 
     // 2. Mise à jour du dernier repas
     pthread_mutex_lock(&philo->data->meal_mutex);
-    philo->last_meal = get_time();
+    philo->last_meal = get_current_time_ms();
     pthread_mutex_unlock(&philo->data->meal_mutex);
 
     // 3. Affichage du message
     pthread_mutex_lock(&philo->data->write_mutex);
     ft_printf("%d philo %d is eating ...\n", 
-        (int)(get_time() - philo->data->start_time), philo->id);
+        (int)(get_current_time_ms() - philo->data->start_time), philo->id);
     pthread_mutex_unlock(&philo->data->write_mutex);
     
     // 4. Attente et libération des fourchettes

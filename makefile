@@ -12,8 +12,9 @@ LIBFT = $(LIBFT_PATH)/libft.a
 # Sources
 SRCS = main.c \
        init.c \
-       routine.c \
-	   simulation.c
+       philosopher_action.c \
+       philosopher_routine.c \
+       simulation_monitor.c
 
 # Objets
 OBJS = $(SRCS:.c=.o)
