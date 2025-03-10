@@ -60,6 +60,20 @@ int init_data(t_data *data, int argc, char **argv)
         return (1);
     }
 
+    // Initialisation du mutex pour protéger last_meal
+    if (pthread_mutex_init(&data->meal_mutex, NULL) != 0)
+    {
+        ft_printf("Error: pthread_mutex_init meal_mutex failed\n");
+        return (1);
+    }
+
+    // Initialisation du mutex pour protéger finished
+    if (pthread_mutex_init(&data->finished_mutex, NULL) != 0)
+    {
+        ft_printf("Error: pthread_mutex_init finished_mutex failed\n");
+        return (1);
+    }
+
     // Allocation et initialisation des philosophes
     data->philos = malloc(sizeof(t_philo) * data->num_philos);
     if (!data->philos)

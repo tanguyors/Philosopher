@@ -28,9 +28,11 @@ typedef struct s_data
     int time_to_sleep;         // Temps de sommeil
     int num_must_eat;          // Nombre de repas à manger (-1 si infini)
     long long start_time;      // Timestamp du début de la simulation
+    pthread_mutex_t finished_mutex;  // Nouveau mutex pour protéger finished
     int finished;              // Flag pour arrêter la simulation
     pthread_mutex_t *forks;    // Tableau des mutex pour les fourchettes
     pthread_mutex_t write_mutex; // Mutex pour l'affichage
+    pthread_mutex_t meal_mutex;  // Pour protéger l'accès à last_meal
     t_philo *philos;          // Tableau des philosophes
 } t_data;
 
